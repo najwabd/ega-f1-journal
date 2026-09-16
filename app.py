@@ -7,7 +7,7 @@ from datetime import datetime
 # 1. PESAN HARIAN DARI KAMU UNTUK EGA
 # ==========================================================
 DAILY_MESSAGES = [
-    "Radio check, Ega. Seperti kata Toto ke Kimi Antonelli: 'Focus on your line, the speed is already there.' Apapun rintangan hari ini, kamu punya talenta dan determinasi buat ngelewatinnya! #Cakep #Asik",
+    "Radio check, Ega. Seperti kata Toto ke Kimi Antonelli: 'Focus on your line, the speed is already there.' Apapun rintangan hari ini, kamu punya talenta dan determinasi buat ngelewatinnya!",
     "Box, box, box! Kalau hari ini ban dan mesin kamu rasanya panas, masuk pit lane sebentar. Dinginkan kepala, ganti kompon baru. Besok kita push lagi dari flying lap!",
     "It's Antonelli pace time! Berani ambil racing line sendiri walau kelihatannya sempit dan berliku. Masalah hari ini cuma apex tajam yang bakal bikin instingmu makin tajam.",
     "Data telemetri hari ini menunjukkan progres yang luar biasa, Ga. Gap waktu makin mengecil. Terus konsisten dan jangan terlalu keras sama diri sendiri.",
@@ -21,7 +21,7 @@ def get_todays_message():
     return DAILY_MESSAGES[day_idx]
 
 # ==========================================================
-# 2. SETUP & STYLING COMPACT MERCEDES F1
+# 2. SETUP & STYLING COMPACT MERCEDES F1 (FIXED DARK INPUT)
 # ==========================================================
 st.set_page_config(
     page_title="Mercedes-AMG F1 | Antonelli #12 Ega Paddock",
@@ -35,16 +35,17 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap');
 
     .stApp {
-        background-color: #080a0d;
+        background-color: #080a0d !important;
         background-image: radial-gradient(#151b22 1px, transparent 1px);
         background-size: 18px 18px;
-        color: #f1f5f9;
+        color: #f1f5f9 !important;
         font-family: 'Inter', sans-serif;
     }
 
-    h1, h2, h3, h4 {
+    h1, h2, h3, h4, label p {
         font-family: 'Orbitron', sans-serif !important;
         letter-spacing: 1px;
+        color: #f1f5f9 !important;
     }
 
     .telemetry-code {
@@ -81,7 +82,7 @@ st.markdown("""
 
     /* COMPACT BUTTONS */
     .stButton > button {
-        background: #11161d;
+        background: #11161d !important;
         color: #00A19B !important;
         border: 1px solid #00A19B !important;
         border-radius: 6px;
@@ -107,13 +108,40 @@ st.markdown("""
         border: none !important;
     }
 
-    /* Compact Inputs */
-    .stTextInput > div > div > input, .stTextArea > div > div > textarea {
-        background-color: #090c10 !important;
-        border: 1px solid #24303e !important;
+    /* ==========================================================
+       TARGET KHUSUS BASEWEB STREAMLIT SUPAYA BOX JADI GELAP
+       ========================================================== */
+    /* Container Luar & Pembungkus Input */
+    div[data-baseweb="input"],
+    div[data-baseweb="base-input"],
+    div[data-baseweb="textarea"] {
+        background-color: #0f1318 !important;
+        border: 1.5px solid #24303e !important;
+        border-radius: 6px !important;
+    }
+
+    /* Efek Saat Input Diklik (Focus) */
+    div[data-baseweb="input"]:focus-within,
+    div[data-baseweb="textarea"]:focus-within {
+        border-color: #00A19B !important;
+        box-shadow: 0 0 10px rgba(0, 161, 155, 0.35) !important;
+        background-color: #121820 !important;
+    }
+
+    /* Elemen Input & Textarea di Dalamnya */
+    input[type="text"], 
+    textarea {
+        background-color: transparent !important;
         color: #f8fafc !important;
-        border-radius: 6px;
-        font-size: 13px !important;
+        font-size: 13.5px !important;
+        caret-color: #00A19B !important;
+        border: none !important;
+    }
+
+    /* Placeholder text */
+    input::placeholder, 
+    textarea::placeholder {
+        color: #64748b !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -263,7 +291,6 @@ elif st.session_state.current_page == "log":
         </div>
         """, unsafe_allow_html=True)
 
-        # Form Input Cepat (Tekan Enter langsung nambah)
         with st.form("new_task_form", clear_on_submit=True):
             f_col1, f_col2 = st.columns([4, 1])
             with f_col1:
@@ -276,7 +303,6 @@ elif st.session_state.current_page == "log":
                 st.session_state.todo_submitted = False
                 st.rerun()
 
-        # Telemetri Progress Bar
         total_tasks = len(st.session_state.todos)
         completed_tasks = sum(1 for t in st.session_state.todos if t["done"])
         progress_val = completed_tasks / total_tasks if total_tasks > 0 else 0
@@ -289,7 +315,6 @@ elif st.session_state.current_page == "log":
         """, unsafe_allow_html=True)
         st.progress(progress_val)
 
-        # Daftar Checklist To-Do
         st.write("")
         for idx, item in enumerate(st.session_state.todos):
             cols_t = st.columns([9, 1])
@@ -297,7 +322,6 @@ elif st.session_state.current_page == "log":
                 checked = st.checkbox(item["task"], value=item["done"], key=f"todo_item_{idx}")
                 st.session_state.todos[idx]["done"] = checked
             with cols_t[1]:
-                # Tombol hapus tugas jika salah ketik
                 if st.button("✕", key=f"del_{idx}", help="Hapus item ini"):
                     st.session_state.todos.pop(idx)
                     st.rerun()
